@@ -128,7 +128,6 @@ function my_prompt_command()
     else
         PS1="${debian_chroot:+($debian_chroot)}\u@\h:\w\$ "
     fi
-    unset color_prompt force_color_prompt
 
     # If this is an xterm set the title to user@host:dir
     case "$TERM" in
