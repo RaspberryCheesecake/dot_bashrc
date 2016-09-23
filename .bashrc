@@ -103,6 +103,19 @@ if ! shopt -oq posix; then
   fi
 fi
 
+##-ANSI-COLOR-CODES-##
+Color_Off="\033[0m"
+###-Regular-###
+Red="\033[0;31m"
+Green="\033[0;32m"
+Purple="\033[0;35m"
+Cyan="\033[0;34m"
+Yellow="\033[0;33m"
+####-Bold-####
+BRed="\033[1;31m"
+BPurple="\033[1;35m"
+
+
 # This is the scary bit: wrap everything that does prompt display
 # into a single function that I determine
 function my_prompt_command()
@@ -111,9 +124,9 @@ function my_prompt_command()
     PS1=""
 
     if [ "$color_prompt" = yes ]; then
-        PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+        PS1="${debian_chroot:+($debian_chroot)}\[$Green\]\u@\h\[$Color_Off\]:\[$Cyan\]\w\[$Color_Off\]$ "
     else
-        PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+        PS1="${debian_chroot:+($debian_chroot)}\u@\h:\w\$ "
     fi
     unset color_prompt force_color_prompt
 
@@ -129,14 +142,14 @@ function my_prompt_command()
     # Addition to display which Python virtual env you are in (if any)
     if [[ $VIRTUAL_ENV != "" ]]; then
         # Strip out the path of the venv and just leave the env name
-        venv="\[$Color_On\]${Cyan}(${VIRTUAL_ENV##*/})\[$Color_Off\]"
+        venv="\[$Cyan\](${VIRTUAL_ENV##*/})\[$Color_Off\]"
     else
         # In case you don't have one activated
-        venv=''
+        venv=""
     fi
     
     #now add this result to the prompt
-    PS1+="$venv"
+    PS1=$venv$PS1
     
     # reset value of storage container to prevent it from displaying when outside repo...
     git_whats_up=""
@@ -151,13 +164,11 @@ function my_prompt_command()
             branch="(`git describe --all --contains --abbrev=4 HEAD 2> /dev/null || echo HEAD`)"
         fi
         # update the status message we want to display on prompt
-        git_whats_up+="{$branch}"
+        git_whats_up+="{$branch}→ "
     fi
 
     # now add this result to the prompt
     PS1+="$git_whats_up"
-
-    PS1+="→ "
 
 }
 
