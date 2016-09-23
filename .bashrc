@@ -56,21 +56,8 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
-if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-fi
-unset color_prompt force_color_prompt
-
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
+# removed other things about displaying to PS1 from here and put
+# them into own function
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -116,6 +103,62 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# Addition to display which Python virtual env you are in
-export WORKON_HOME=$HOME/.virtualenvs
-source /usr/local/bin/virtualenvwrapper.sh
+# This is the scary bit: wrap everything that does prompt display
+# into a single function that I determine
+function my_prompt_command()
+{
+    # reset value of prompt command to blank at start
+    PS1=""
+
+    if [ "$color_prompt" = yes ]; then
+        PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    else
+        PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+    fi
+    unset color_prompt force_color_prompt
+
+    # If this is an xterm set the title to user@host:dir
+    case "$TERM" in
+    xterm*|rxvt*)
+        PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+        ;;
+    *)
+        ;;
+    esac
+
+    # Addition to display which Python virtual env you are in (if any)
+    if [[ $VIRTUAL_ENV != "" ]]; then
+        # Strip out the path of the venv and just leave the env name
+        venv="\[$Color_On\]${Cyan}(${VIRTUAL_ENV##*/})\[$Color_Off\]"
+    else
+        # In case you don't have one activated
+        venv=''
+    fi
+    
+    #now add this result to the prompt
+    PS1+="$venv"
+    
+    # reset value of storage container to prevent it from displaying when outside repo...
+    git_whats_up=""
+    # check if inside git repo
+    local git_status="`git status -unormal 2>&1`"
+    if ! [[ "$git_status" =~ Not\ a\ git\ repo ]]; then
+        # parse the output of git status
+        if [[ "$git_status" =~ On\ branch\ ([^[:space:]]+) ]]; then
+            branch=${BASH_REMATCH[1]}
+        else
+            # Detached HEAD. (branch=HEAD is a faster alternative.)
+            branch="(`git describe --all --contains --abbrev=4 HEAD 2> /dev/null || echo HEAD`)"
+        fi
+        # update the status message we want to display on prompt
+        git_whats_up+="{$branch}"
+    fi
+
+    # now add this result to the prompt
+    PS1+="$git_whats_up"
+
+    PS1+="→ "
+
+}
+
+PROMPT_COMMAND=my_prompt_command
