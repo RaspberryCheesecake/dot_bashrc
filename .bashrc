@@ -115,6 +115,12 @@ Yellow="\033[0;33m"
 BRed="\033[1;31m"
 BPurple="\033[1;35m"
 
+# oh crap, need to make sure it knows where to find the virtualenv stuff!
+# else it will say, workon isn't a command it knows
+
+export VIRTUAL_ENV=$HOME/.virtualenvs
+source /usr/local/bin/virtualenvwrapper.sh
+
 
 # This is the scary bit: wrap everything that does prompt display
 # into a single function that I determine
