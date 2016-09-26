@@ -117,8 +117,8 @@ BPurple="\033[1;35m"
 
 # oh crap, need to make sure it knows where to find the virtualenv stuff!
 # else it will say, workon isn't a command it knows
+# but DON'T need to export to $VIRTUAL_ENV
 
-export VIRTUAL_ENV=$HOME/.virtualenvs
 source /usr/local/bin/virtualenvwrapper.sh
 
 
@@ -169,7 +169,7 @@ function my_prompt_command()
             branch="(`git describe --all --contains --abbrev=4 HEAD 2> /dev/null || echo HEAD`)"
         fi
         # update the status message we want to display on prompt
-        git_whats_up+="{$branch}→ "
+        git_whats_up+="{$branch}$ "
     fi
 
     # now add this result to the prompt
