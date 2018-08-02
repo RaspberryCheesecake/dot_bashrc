@@ -119,8 +119,9 @@ BPurple="\033[1;35m"
 # else it will say, workon isn't a command it knows
 # but DON'T need to export to $VIRTUAL_ENV
 
-source /usr/local/bin/virtualenvwrapper.sh
-
+if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then 
+  source /usr/local/bin/virtualenvwrapper.sh
+fi
 
 # This is the scary bit: wrap everything that does prompt display
 # into a single function that I determine
